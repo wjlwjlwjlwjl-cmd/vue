@@ -1,0 +1,12 @@
+{
+  "name": "es-module",
+  "version": "1.0.0",
+  "description": "start",
+  "license": "ISC",
+  "author": "wjl",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  }
+}
