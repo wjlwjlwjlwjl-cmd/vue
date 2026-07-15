@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html, body{
+            background-color: #222436;
+            color: #e8e8e8
+        }
+    </style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--CDN 引入 vue-->
+</head>
+<body>
+    <div id="app">
+        <p>{{obj.name}}</p>
+        <p>{{obj.age}}</p>
+        <p>{{}}</p>
+        <p>msg: {{msg}}</p>
+        <h1>Computer Info:</h1>
+        <p>Brand: {{obj2.brand}}</p>
+        <p>CPU: {{obj2.cpu}}</p>
+        <button @click="onClick">修改响应式数据</button>
+    </div>
+</body>
+<script>
+    //数据响应式：数据变了，试图也跟着改变
+    const { createApp, reactive, ref } = Vue     //解构出 createApp 和响应式函数 reactive、ref
+    createApp({
+        setup(){
+            const obj = reactive({      //reactive 接收一个对象作为参数，并返回一个响应式对象
+                name: "zhangsan",
+                age: 19
+            })
+            const msg = ref('hello vue3')
+            const obj2 = ref({
+                brand: 'Lenevo',
+                cpu: 'AMD'
+            })
+
+            //操作 ref 创建的数据，js 中需要 .value，template 中不可 .value；reactive 只能创建对象的响应式数据，但是操作创建的数据不需要 .value
+            const onClick = () => {
+                msg.value = '你好 vue3'
+
+                obj.name = 'lisi'
+                obj.age = 20
+
+                obj2.value.brand = 'HUAWEI'
+                obj2.value.cpu = "Intel"
+            }
+
+            return {
+                obj,
+                msg,
+                onClick,
+                obj2
+            }
+        }
+    }).mount("#app")
+</script>
+</html>

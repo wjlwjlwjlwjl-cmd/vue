@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html, body{
+            background-color: #222436;
+            color: #e8e8e8
+        }
+    </style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> <!--CDN 引入 vue-->
+</head>
+<body>
+    <!--准备容器-->
+    <div id="app">
+        <!--插值表达式（表达式指的是有结果的操作/运算）-->
+        <h1>{{msg}}</h1>
+        <p>{{obj}}</p>
+        <p>{{obj.age > 18 ? '已成年' : '未成年'}}</p>
+        <p>{{obj.age + 1}}</p>
+        <p>{{fn()}}</p>
+    </div>
+    <script>
+        //创建 app
+        Vue.createApp({
+            setup(){    //setup函数，是 Vue 代码的入口，后续 Vue 的逻辑代码都是在这里编写的
+                const msg = 'Hello Vue'   //准备数据
+
+                obj = {
+                    name: 'zhangsan',
+                    age: 18
+                }
+
+                function fn(){
+                    return "fn()"
+                }
+
+                return {
+                    msg,    //在 setup 函数中，定义并返回初始数据
+                    obj,
+                    fn
+                }
+            }
+        }).mount('#app')    //内容渲染到 id=app 的盒子里
+    </script>
+</body>
+</html>
