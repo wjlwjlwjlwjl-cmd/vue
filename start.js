@@ -125,6 +125,7 @@ console.log(arr1.includes(4)); //查看是否包含某个元素
 console.log(arr1.includes(1));
 
 //遍历
+//arr1.forEach((item, index, array) => {})
 let sum = 0;
 arr1.forEach((item) => {
   sum += item;
@@ -170,6 +171,7 @@ let isEven = evens.every((item) => {
 console.log(isEven);
 
 // 汇总
+// arr1.reduce(prev, item, index, array) => {}, initValue)
 let sumArr1 = arr1.reduce((prev, item) => {
   return prev + item;
 }, 0);
