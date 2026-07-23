@@ -304,3 +304,43 @@ const isAll = computed({
 
 > 关于浏览器持久化
 > 浏览器提供了 localStorage，可以帮助我们通过 kv 的方式存储键值对数据，但是数据需要是序列化后的结果（可以通过 `JSON.stringify` 和 `JSON.parse`）
+
+## 四、组件及组件化 + 组件生命周期
+
+### 4.1 组件的导入与注册
+
+1. 局部组件直接导入（比如 `import MyLabel from 'MyLabel.vue'` 即可，无需在 main.js 中注册。使用时，建议使用大驼峰法或者烤串法，比如 `<MyLabel />` 或者 `<my-label />`。其实组件的导入有点类似与 C++ 的 include，不过这里没有 STL，但是类似的是 A 导入了某个组件不代表 B 也能直接使用这个组件
+
+2. 局部组件的全局注册，需要在 main.js 中进行，同时还需要进行注册，例如：
+
+```js
+import MyLabel from './components/MyLabel.vue'
+app.component('MyLabel', MyLabel)
+```
+
+### 4.2 组件的生命周期
+
+1. 创建：创建响应式数据
+2. 挂载：渲染模板
+3. 更新：修改数据，更新视图
+4. 卸载：卸载组件
+
+从**创建到卸载**的过程，就是 Vue 组件的生命周期。在各个步骤之间，会自动运行一些函数，这些函数就是**Vue生命周期钩子**
+
+### 4.3 Vue 生命周期钩子
+
+#### 4.3.1 选项式
+
+1. setup()，Vue 组件创建/出生阶段
+2. beforeCreate()，创建前，无法访问数据和方法
+3. created()，创建后，组件中的数据和方法允许访问 //**创建阶段**
+4. beforeMount()，组件挂载到 DOM 树前，此时组件尚未变成真正的 DOM，无法获取
+5. mounted()，标签已经变成了真正的 DOM，可以进行获取 //**挂载阶段**
+6. beforeUpdate()，在更新前，数据发生改变，标签重新渲染
+7. updated()，更新后 //**更新阶段**
+8. beforeUnmount()，卸载阶段开始
+9. unmounted()，组件卸载之后 //**销毁阶段**
+
+钩子函数在特定时刻会自动执行，给了开发者在不同时机添加自己代码的机会；选项式 API 下，组件首次渲染，会执行 setup、beforeCreate、created、beforeMount、mounted
+
+#### 4.3.2 组合式
