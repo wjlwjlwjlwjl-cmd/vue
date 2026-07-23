@@ -156,9 +156,151 @@ setup 函数是 Vue 代码的入口，所有 Vue 的逻辑代码都在这里实�
 
 	* Vue 会试图复用 DOM 以提高渲染性能, 为了方便 Vue 对标签进行排序复用, 可以通过 `v-for='item, index in vals' :key="item.id"` 的方式指明某个字段作为 key. 这里的 id 从选用上来说类似于数据库的主键(当然两者作用完全不同), 不要使用 index 这种会随业务发生改变的字段, 建议单独加上一个 id 属性
 
-## 双向绑定
+## 2.6 双向绑定
+
+### 2.6.1 基本语法
 
 * 语法格式: `v-model="reactive_variable_name"`.
 * 视图的改变会影响数据
 * 数据的改变会影响视图
 * 常与 `<input>` 标签搭配使用
+
+### 2.6.2 v-model 修饰符
+
+1. `v-model.trim`，去除首尾空格
+2. `v-model.number`，尝试使用 parseFloat() 转换为数字
+3. `v-model.lazy`，懒同步，即失去焦点时才同步响应式数据，而不是输入过程中一直同步
+
+### 2.6.3 v-model 作用在其他表单元素上
+
+**textarea**
+
+```html
+<script setup>
+import { ref } from 'vue'
+const selfIntro = ref( '' )
+</script>
+
+<template>
+    <textarea v-model.trim="selfIntro" placeholder="请输入自我介绍"></textarea>
+</template>
+```
+
+**select 下拉菜单**
+
+```html
+<script>
+import { ref } from 'vue'
+const region = ref( '' )
+</script>
+
+<template>
+    <select v-model="region">
+        <option value="SH">上海</option>
+        <option value="BJ">北京</option>
+        <option value="GZ">广州</option>
+    </select>
+</template>
+```
+
+**单选框**
+
+```html
+<script>
+import { ref } from 'vue'
+const blood = ref( '' )
+</script>
+
+<template>
+    <input type="radio" value="A" v-model="blood">
+    <input type="radio" value="B" v-model="blood">
+    <input type="radio" value="AB" v-model="blood">
+    <input type="radio" value="O" v-model="blood">
+</template>
+```
+
+**复选框**
+
+```html
+<script>
+import { ref } from 'vue'
+const hobby = ref( [''] )
+const agree = ref( false )
+</script>
+
+<template>
+    <input type="checkbox" value="吃饭" v-model="hobby">
+    <input type="checkbox" value="睡觉" v-model="hobby">
+    <input type="checkbox" value="打豆豆" v-model="hobby">
+    <input type="checkbox" value="确认信息无误" v-model="agree"> <!--当一组候选框只有一个时，v-model会绑定到布尔值表示是否选中-->
+</template>
+```
+
+# 三、指令补充
+
+## 3.1 指令修饰符
+
+### 3.1.1 按键修饰符
+
+1. `@keydown.enter`，当按键 enter 被按下时，`@keyup.enter`，当按键 enter 被抬起时
+2. `@mouseenter`，当鼠标进入时，`@mouseleave`，当鼠标离开时
+
+### 3.1.2 事件修饰符
+
+1. 事件修饰符主要是两个，`.prevent` 和 `.stop`
+2. `.prevent`，是阻止组件的默认行为，比如下面的 a 标签就无法跳转
+
+```html
+<template>
+    <div @click='function'>
+        <a href="www.baidu.com" @click.prevent>百度一下</a>
+    </div>
+</template>
+```
+
+3. `.stop`，是阻止组建将事件向上传递，例如上面的代码，虽然不会跳转，但依然会执行 `function` 回调，就是因为事件向上传递。
+4. `.stop` 和 `.prevent` 可以链式使用，比如 `@click.stop.prevent`
+
+## 3.2 样式绑定
+
+### 3.2.1 操作 class
+
+样式绑定操作 class，常与 <style> 中的类选择器搭配使用，比如批量根据条件设置为 active 或者 inactive 的样式
+
+1. 方式一：`:class="condition ? 'className1' : 'className2'"`
+2. 方式二： `:class="{ className1: condition1, className2: condition2}"`
+3. 动态 class 和静态 class 可以共存
+
+### 3.2.2 操作 style
+
+1. 方式一：`:style="{ css1: cssVal1, css2: cssVal2 }"`
+2. 方式二：`:style="cssObj"`
+
+### 3.2.3 computed 计算属性
+
+1. computed 需要从 'vue' 中导入，返回计算过的值，同时当计算这个值依赖的数据发生改变时，会自动重新计算
+
+2. computed，当只需要获取数据并自动更新时，可以直接传入箭头函数作为 get()，即默认不需要 set()；但是当需要修改数据（即绑定到 v-model 时），就需要computed 的完整写法，即：
+
+```html
+const isAll = computed({
+    get(){
+        somecode_to_generate_data
+        return data
+    },
+    set(val){
+        some_code_to_manipulate_data
+    }
+})
+```
+
+这里的 set，会在通过 v-model 绑定到 isAll 的标签修改 isAll 时，自动调用 set，此时传入的 val 就是 isAll 的值
+
+3. 相比与普通函数，computed 自带缓存功能，只有当依赖的数据发生改变时才会重新调用 get 生成
+
+### 3.2.4 侦听器
+
+1. `watch`，同样需要从 'vue' 中导入，要求监控的对象是相应数据源，语法格式为：`watch(objWatched, (newVal, oldVal) => {somecodes})`，当响应式数据发生改变时，会自动调用回调函数
+
+> 关于浏览器持久化
+> 浏览器提供了 localStorage，可以帮助我们通过 kv 的方式存储键值对数据，但是数据需要是序列化后的结果（可以通过 `JSON.stringify` 和 `JSON.parse`）
