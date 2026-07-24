@@ -207,6 +207,18 @@
       "bases:新建数据库": false
     }
   },
-  "active": "c20f6d2babf3c4a0",
-  "lastOpenFiles": []
+  "active": "12cdf76b09a1a5fb",
+  "lastOpenFiles": [
+    "scaf_folding/src/App.vue",
+    "scaf_folding/src/assets/style.css",
+    "scaf_folding/src/components/TodoFooter.vue",
+    "scaf_folding/src/components/TodoMain.vue",
+    "scaf_folding/src/components/TodoHeader.vue",
+    "scaf_folding/src/components/DodoHeader.vue",
+    "scaf_folding/src/components/ToolHeader.vue",
+    "scaf_folding/src/components/ToolBar.vue",
+    "scaf_folding/src/props校验.vue",
+    "scaf_folding/src/父子通信.vue",
+    "scaf_folding/src/props与emit.vue"
+  ]
 }

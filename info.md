@@ -265,7 +265,7 @@ const agree = ref( false )
 
 ### 3.2.1 操作 class
 
-样式绑定操作 class，常与 <style> 中的类选择器搭配使用，比如批量根据条件设置为 active 或者 inactive 的样式
+样式绑定操作 class，常与 `</style>` 中的类选择器搭配使用，比如批量根据条件设置为 active 或者 inactive 的样式
 
 1. 方式一：`:class="condition ? 'className1' : 'className2'"`
 2. 方式二： `:class="{ className1: condition1, className2: condition2}"`
@@ -309,7 +309,7 @@ const isAll = computed({
 
 ### 4.1 组件的导入与注册
 
-1. 局部组件直接导入（比如 `import MyLabel from 'MyLabel.vue'` 即可，无需在 main.js 中注册。使用时，建议使用大驼峰法或者烤串法，比如 `<MyLabel />` 或者 `<my-label />`。其实组件的导入有点类似与 C++ 的 include，不过这里没有 STL，但是类似的是 A 导入了某个组件不代表 B 也能直接使用这个组件
+1. 局部组件直接导入（比如 `import MyLabel from './components/MyLabel.vue'` 即可，无需在 main.js 中注册。使用时，建议使用大驼峰法或者烤串法，比如 `<MyLabel />` 或者 `<my-label />`。其实组件的导入有点类似与 C++ 的 include，不过这里没有 STL，但是类似的是 A 导入了某个组件不代表 B 也能直接使用这个组件
 
 2. 局部组件的全局注册，需要在 main.js 中进行，同时还需要进行注册，例如：
 
@@ -333,14 +333,188 @@ app.component('MyLabel', MyLabel)
 
 1. setup()，Vue 组件创建/出生阶段
 2. beforeCreate()，创建前，无法访问数据和方法
-3. created()，创建后，组件中的数据和方法允许访问 //**创建阶段**
+3. created()，创建后，组件中的数据和方法允许访问 
 4. beforeMount()，组件挂载到 DOM 树前，此时组件尚未变成真正的 DOM，无法获取
-5. mounted()，标签已经变成了真正的 DOM，可以进行获取 //**挂载阶段**
+5. mounted()，标签已经变成了真正的 DOM，可以进行获取 
 6. beforeUpdate()，在更新前，数据发生改变，标签重新渲染
-7. updated()，更新后 //**更新阶段**
+7. updated()，更新后 
 8. beforeUnmount()，卸载阶段开始
-9. unmounted()，组件卸载之后 //**销毁阶段**
+9. unmounted()，组件卸载之后 
+
+```html
+<script>
+    export default{
+        beforeCreate(){
+            //some codes
+        }
+        created(){
+            //some codes
+        }
+    }
+</script>
+```
 
 钩子函数在特定时刻会自动执行，给了开发者在不同时机添加自己代码的机会；选项式 API 下，组件首次渲染，会执行 setup、beforeCreate、created、beforeMount、mounted
 
 #### 4.3.2 组合式
+
+Vue2 更加推荐选项式, Vue3 更加推荐组合式 
+
+```html
+<script setup>
+    onBeforeMount(){
+        // some codes
+    }
+    mounted(){
+        //some codes
+    }
+</script>
+```
+
+1. 创建阶段: setup
+2. 挂载阶段: onBeforeMount, onBeforeMounted
+3. 更新阶段: onBeforeUpdate, onUpdated
+4. 销毁阶段: onBeforeUnmount, unmounted(清理工作)
+
+利用组建的生命周期,可以进行如下操作
+
+### 4.4 生命周期的应用
+
+#### 4.4.1 在 setup 中异步请求数据
+
+```html
+<script>
+	import axios from 'axios'
+	const images = ref([])
+	async function getData(){
+		resp = await axios({ //axios 调用后返回 Promise, 获取可以使用 await, 并使用 async 修饰 getData,完成异步请求
+			method: 'GET', //默认方法是 GET
+			url: 'url'
+		})
+		images.value = resp.data.data //假设返回正文的所需数据对应字段是 data
+	}
+	getData()
+</script>
+```
+
+#### 4.4.2 操作组件
+
+使用组合式钩子时, 可以在 onMounted 时操作 DOM 对象(通过 document.querySelector)
+
+## 五、scoped + 组件通信 + props 校验
+
+### 5.1 scoped
+
+一个 .vue 文件, 或者说组件, 一般由三部分组成: `template` `script` `style`. 其中 style 部分 默认是全局生效的, 但是这并不是我们想要的效果, 所以可以加上 scoped 来让属性只局部生效, 比如: 
+
+```html
+<style scoped>
+</style>
+```
+
+原理是当加上 scoped 后, vue 会给所有组件加上一个 data-v-xxxx(hash值) 的自定义属性, 并给该组件的 `<style>` 中的所有选择器加上 `[data-v-xxxx]` 的属性选择器, 是的只能够选中本组件中的元素
+
+### 5.2 父子组件之间通信
+
+#### 5.2.1 父 -> 子
+
+1. 子组件通过 `const props = defineProps(['v1', 'v2'])` 的方式定义哪些值在父子之间传递, 后续子组件可以通过 `props.v1` `props.v2` 的方式或者直接像普通变量一样使用父组件的数据
+2. 父组件首先需要导入子组件, 父组件通过为子组件自定义属性的方式传递数据, 例如:
+
+```html
+<!--App.vue-->
+<script setup>
+	import SubItem from './components/SubItem.vue'
+	import ref from 'vue'
+	const num = ref(1)
+</script>
+<template>
+	<SubItem :num='num'/>
+</template>
+
+<!--SubItem.vue-->
+<script>
+	const props = defineProps(['num'])
+</script>
+<template>
+	<label>{{ props.num }}</label>
+</template>
+```
+
+3. 那么我们尝试在子组件中修改数据呢? 不可以, 因为 props 具有只读属性, 即: 谁的数据谁管理. 所以应该怎样修改呢? Vue 采取的方式是由父组件自己修改自己的数据
+
+#### 5.2.2 子 -> 父
+
+1. 子触发: 子组件通过 `const emit = defineEmits()` 的方式定义 emit, 当子组件因为某种条件需要修改数据时, 就可以调用 emit, 通过 `emit('dataEmit', data...)` 的方式发送数据给父组件
+2. 父绑定: 父组件给子组件绑定一个回调, 例如 `<SubItem @dataEmit='callBack'\>`; `callBack` 函数用来接收数据并进行处理, 其参数应正好对应 emit 所传数据
+
+```html
+<script setup>
+	import SubItem from './components/SubItem.vue'
+	import ref from 'vue'
+	const nums = ref([1, 2, 3])
+	const del = (index) => {
+		nums.value.splice(index, 1);
+	}
+</script>
+<template>
+	<SubItem :nums='nums' @del='del'/>
+</template>
+
+<!--SubItem.vue-->
+<script>
+	const props = defineProps(['nums'])
+	const emit = defineEmits()
+</script>
+<template>
+	<div>
+		<div v-for="item, index in nums">
+			<label>{{ item }}</label>
+			<button @click="emit('del', index)"></button> <!-- 此处也可以是含有emit的函数 -->
+		</div>	
+	</div>
+</template>
+```
+
+#### 5.2.3 祖孙之间（即组件关系隔了层级）
+
+* 祖先通过 `provide("dataName", data)` 的方式向孙组件传递数据
+* 孙组件通过 `const data = inject("dataName")`
+* 两者都需要从 `vue` 中导入
+
+#### 5.2.4 普通组件之间
+
+* 普通组件之间通信，可以通过引入 mitt 包进行
+* 通信双方想要通信，就要先看到同一份资源，在这里就是 emitter，可以通过 export default 的方式让这个 emitter 全局可见
+* 发送方通过 `emitter.emit("dataName", data...)` 的方式发送
+* 接收方通过 `emitter.on("dataName", (data...) => {}` 的方式接收并处理数据
+
+### 5.3 props 校验
+
+Vue 允许我们在定义 props 的时候, 对数据添加一些规则, 具体有下面几种
+
+* type：数据类型限制，比如 Number、String、Array、Boolean 等
+* required：是否必须
+* default：数据的默认值，这个属性有两点需要注意
+	* 不要和 required 一起使用，不会报错，但是 required 的优先级高于 default，会导致默认值不生效
+	* 对于基本数据类型可以直接使用默认值，但是如果是自定义类型需要通过函数返回
+* validator：对数据进行值的校验，类似数组的 filter，符合要求返回 true，否则返回 false
+
+```html
+<script>
+	const props = defineProps({
+		opacity: {
+			type: Number, 
+			required: true, 
+			validator: (value) => {
+				if(opacity > 0 && opacity < 1){
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+		}
+	})
+</script>
+```
