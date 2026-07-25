@@ -518,3 +518,123 @@ Vue 允许我们在定义 props 的时候, 对数据添加一些规则, 具体�
 	})
 </script>
 ```
+
+## 六、vue-router，vue 路由管理
+
+### 6.1 vue-router 基本使用
+
+vue-router 是 Vue 的官方路由管理器，使用分为四部
+
+1. **下载**：`npm i vue-router -S`
+2. **导入**：`createRouter` `createWebHashHistory/createWebHistory`
+3. **创建**
+4. **注册**：`app.addRouter()`
+
+其中，`createWebHashHistory` 比 `createWebHistory`  更适合开发阶段使用，不需要后端服务器。浏览器规定，`#` 后的 url 部分不会发送给后端服务器。这样前端请求的永远是 `/`，有前端自行配置路由规则（比如 `http://localhost:5173/#/`）
+
+**路由创建与配置路由规则**
+
+```js
+import { createRouter, createWebHashHistory } from 'vue-router'
+import Find from '@/components/Find.vue'
+import Like from '@/components/Like.vue'
+import App from './App.vue'
+import { createApp } from 'vue'
+const router = createRouter({
+	history: createWebHashHistory(),
+	routes:[
+		{
+			path: '/find',
+			component: Find
+		},
+		{
+			path: `/like`,
+			component: Like
+		}
+	]
+})
+const app = createApp()
+app.use(router)
+app.mount("#app")
+```
+
+建议把上述路由配置放到单独的 JS 文件中，比如 `./router/index.js`，都放在 main.js 中会过于臃肿
+
+> 在 Vue 脚手架中，可以使用 `@` 代表 src 目录
+
+**添加跳转连接和出口点**
+
+跳转连接使用 `<router-link><router-link>`，出口点（符合路由规则的组建的挂载点）使用 `<router-view>`，例如
+
+```html
+<template>
+	<router-link to="/find"></router-link>
+	<router-link to="/like"></router-link>
+	<router-view />
+</template>
+```
+
+### 6.3 自带高亮类名
+
+点击跳转的 router-link，Vue 会自动根据匹配情况给标签加上 `router-link-exact-active` 和 `router-link-active` 两个 class 属性，用于实现高亮。
+
+`router-link-exact-active` 表示精准匹配，`to='find'` 仅可以匹配到 `/find`；`router-link-active` 表示模糊匹配，`/find` 开头的都可以匹配到 `to="/find"`
+
+### 6.4 传查询参数
+
+#### 6.4.1 路由查询参数
+
+* **传参**，在 `<router-link to="/path?query" \>`  可以直接通过 url 的方式携带参数（路径和参数之间使用 `?` 隔开，参数使用 `参数名=值` 的方式，参数对之间使用 `&` 隔开）
+* **使用参数**，在跳转到的页面中，通过 `useRoute` 获取路由对象，之后通过 `route.query.vName` 的方式获取指定参数的值
+
+#### 6.4.2 动态查询参数
+
+* **定义**，在配置路由规则的时候，通过 `/path/:参数名` 的方式进行占位
+* **传参**，在跳转时，通过 `/path/参数` 的方式直接传递
+* **接收参数**，通过 `useRoute` 获取路由对象后，通过 `route.params.参数名` 的方式获取参数值
+
+> 相对而言，路由查询参数更适合传多个参数，动态查询参数更适合多个参数的传递（虽然也可以传多个）
+
+### 6.5 redirect 重定向
+
+在配置路由规则的时候，直接加上这一条即可，例如：
+
+```js
+const router = createRouter({
+	history: createWebHashHistory(),
+	routes: [{
+		path: '/path', 
+		component: Path, 
+		redirect: '/redirectPath'
+	}]
+})
+```
+
+### 6.6 编程式导航
+
+即通过  JS 代码实现页面的跳转，通过 `router.push('path')` 的方式，例如：
+
+```js
+const router = useRouter()
+function fn(){
+	router.push('/path')
+}
+```
+
+相比于前面的声明式导航，编程式导航也可以传递参数，并且规则和上面的声明式导航的相同
+
+### 6.7 嵌套与守卫
+
+#### 6.7.1 嵌套
+
+嵌套，就是在一个路由得到的页面中，再作为路由出口再加上一套路由体系，方式就是在定义路由时再加上 `children=[{path: '/path', component: Component}]`。同时，需要配置新的路由出口，具体规则和上面一样，不过再配置 `<router-link to=''>` 的时候，跳转路径要涵盖父路径
+
+#### 6.7.2 守卫
+
+守卫，类似于 Spring Boot 的拦截器的作用，可以在访问页面前进行检查，决定是否允许访问，可以返回三种值代表不同的处理方式 
+
+* true/undefined，放行
+* false，不放行
+* 'path'，重定向到指定 URL
+
+将守卫注册到路由，通过 `router.beforeEach((to, from) => {})` 的方式，`to` 为请求跳转的 URL，`from` 为来源 URL

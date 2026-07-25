@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import My from '@/views/My.vue'
 import Find from '@/views/Find.vue'
 import Friend from '@/views/Friend.vue'
+import Ranking from '@/views/Ranking.vue'
+import Recommend from '@/views/Recommend.vue'
+import SongList from '@/views/SongList.vue'
 import _404 from '@/views/_404.vue'
 
 //配置路由：
@@ -23,13 +26,39 @@ const router = createRouter({
     },
     {
       path: "/find/:sid",
-      component: Find
+      component: Find,
+      children: [   //嵌套路由
+        {
+          path: 'ranking',
+          component: Ranking
+        },
+        {
+          path: 'recommend',
+          component: Recommend
+        },
+        {
+          path: 'songlist',
+          component: SongList
+        }
+      ]
     },
     {
       path: '/:pathMatch(.*)*',
       component: _404
     }
-  ]
+  ],
+})
+const isLogin = false
+router.beforeEach((to, from) => {
+  if(to.path === '/my'){
+    if(!isLogin){
+      alert("please login first")
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
 })
 
 export default router

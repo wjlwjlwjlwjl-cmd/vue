@@ -4,12 +4,12 @@
     "type": "split",
     "children": [
       {
-        "id": "1129097d776b9a31",
+        "id": "f8860cae5fbd2cbc",
         "type": "tabs",
-        "dimension": 9.107468123861565,
+        "dimension": 8.680555555555555,
         "children": [
           {
-            "id": "c20f6d2babf3c4a0",
+            "id": "511ddc7fd1a96930",
             "type": "leaf",
             "state": {
               "type": "outline",
@@ -28,7 +28,7 @@
       {
         "id": "4e4a0b6516c3f0cc",
         "type": "tabs",
-        "dimension": 90.89253187613843,
+        "dimension": 91.31944444444444,
         "children": [
           {
             "id": "12cdf76b09a1a5fb",
@@ -207,7 +207,7 @@
       "bases:新建数据库": false
     }
   },
-  "active": "12cdf76b09a1a5fb",
+  "active": "511ddc7fd1a96930",
   "lastOpenFiles": [
     "scaf_folding/src/App.vue",
     "scaf_folding/src/assets/style.css",
