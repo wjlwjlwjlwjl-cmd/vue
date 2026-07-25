@@ -6,7 +6,7 @@
       {
         "id": "f8860cae5fbd2cbc",
         "type": "tabs",
-        "dimension": 8.680555555555555,
+        "dimension": 8.680555555555557,
         "children": [
           {
             "id": "511ddc7fd1a96930",
@@ -16,7 +16,7 @@
               "state": {
                 "file": "info.md",
                 "followCursor": false,
-                "showSearch": false,
+                "showSearch": true,
                 "searchQuery": ""
               },
               "icon": "lucide-list",

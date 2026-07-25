@@ -49,7 +49,7 @@ const router = createRouter({
   ],
 })
 const isLogin = false
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   if(to.path === '/my'){
     if(!isLogin){
       alert("please login first")

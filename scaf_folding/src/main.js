@@ -1,7 +1,8 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import './assets/global.css'
-import router from './router/index.js'
+//import router from './router/index.js'
 
 const app = createApp(App)
 
@@ -12,6 +13,9 @@ const app = createApp(App)
     el.focus()
   }
 })*/
+
+const pinia = createPinia() // 创建 pinia
+app.use(pinia) //注册 pinia
 
 //当挂载时和更新时行为相同，可以简化写法
 app.directive("focus", (el) => {
@@ -42,6 +46,6 @@ app.directive("lazyload", (el, binding) => {
   io.observe(el) //开始监听
 })
 
-app.use(router)
+//app.use(router)
 
 app.mount("#app")

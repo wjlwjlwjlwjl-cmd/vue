@@ -1,18 +1,26 @@
 <script setup>
-// oxlint-disable vue/valid-define-emits
-  const props = defineProps(['todoList'])
-  const emit = defineEmits()
+import { useTodoStore } from '@/store/todo.js'
+import { computed } from 'vue'
+const todoStore = useTodoStore()
+const all = computed({
+  get(){
+    return todoStore.isAll
+  },
+  set(val){
+    todoStore.toggleTodo(val)
+  }
+})
 </script>
 <template>
   <section class="main">
-    <input id="toggle-all" class="toggle-all" type="checkbox" />
+    <input id="toggle-all" class="toggle-all" type="checkbox" v-model="all"/>
     <label for="toggle-all">Mark all as complete</label>
     <ul class="todo-list">
-      <li v-for="item, index in props.todoList">
+      <li v-for="item, index in todoStore.showTodos" :key="item.id">
         <div class="view">
-          <input class="toggle" type="checkbox" @checked="emit('done', index)"/>
-          <label>{{ item.name }}</label>
-          <button class="destroy" @click="emit('del', index)"></button>
+          <input class="toggle" type="checkbox" v-model="item.finished"/>
+          <label>{{ item.text }}</label>
+          <button class="destroy" @click="todoStore.delTodo(index)"></button>
         </div>
       </li>
     </ul>

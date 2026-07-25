@@ -1,17 +1,19 @@
 <script setup>
-// oxlint-disable vue/valid-define-emits
+import { useTodoStore } from '@/store/todo.js'
 import { ref } from 'vue'
 
+const todoStore = useTodoStore()
+
 const content = ref('')
-const emit = defineEmits()
-const addItem = () => {
-  emit('addItem', content.value)
+const addTodo = () => {
+  todoStore.addTodo(content.value)
   content.value = ''
 }
+
 </script>
 <template>
-    <header class="header">
-        <h1>比特人的记事本</h1>
-        <input v-model="content" @keydown.enter="addItem" class="new-todo" placeholder="What needs to be finished?" autofocus />
-    </header>
+  <header class="header">
+    <h1>todos</h1>
+    <input class="new-todo" placeholder="What needs to be finished?" autofocus @keydown.enter="addTodo" v-model="content"/>
+  </header>
 </template>

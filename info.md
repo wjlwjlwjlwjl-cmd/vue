@@ -282,7 +282,7 @@ const agree = ref( false )
 
 2. computed，当只需要获取数据并自动更新时，可以直接传入箭头函数作为 get()，即默认不需要 set()；但是当需要修改数据（即绑定到 v-model 时），就需要computed 的完整写法，即：
 
-```html
+```js
 const isAll = computed({
     get(){
         somecode_to_generate_data
@@ -638,3 +638,49 @@ function fn(){
 * 'path'，重定向到指定 URL
 
 将守卫注册到路由，通过 `router.beforeEach((to, from) => {})` 的方式，`to` 为请求跳转的 URL，`from` 为来源 URL
+
+## 七、pinia，Vue3 状态管理
+
+pinia 用来存放多个组件的共同数据，即每个组件都能够读写同一份数据（通过统一对外暴露的接口）。使用 pinia，需要以下步骤：
+
+1. **下载 pinia**：`npm i pinia -S`
+2. **导入并注册 pinia**：`app.use(createPinia())`
+3. **定义仓库**：`export const useStockStore = defineStore("仓库id", setup 函数或者 Option 对象)`，建议仓库名采取 `use + id + Store` 的方式，setup 函数相对用的多一些，只需要在这里定义，就可以导出普通属性、方法、计算属性 
+4. **其他组件导入仓库**：`const stockStore = useStockStore()`，这样通过 `stockStore.方法`、`stockStore.属性`、`stockStore.计算属性` 就可以访问仓库导出的可以公共访问的内容
+
+```js
+//main.js
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import { createApp } from 'vue'
+
+const app = createApp()
+const pinia = createPinia()
+app.use(pinia)
+
+//@/store/stock.js
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+export default useStockStore = defineStore('stock', () => {
+	const stock = ref(20)
+	const sub = computed(() => {
+		return stock.value--
+	})
+	const add = computed(() => {
+		return stock.value++
+	})
+	const double = () => {
+		return stock.value * 2
+	}
+	return {
+		stock,
+		add,
+		sub,
+		double
+	}
+})
+
+//其他组件
+import { useStockStore } from '@/store/stock.js'
+const stockStore = useStockStore()
+```
