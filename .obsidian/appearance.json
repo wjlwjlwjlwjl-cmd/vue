@@ -1,5 +1,6 @@
 {
   "baseFontSize": 26,
   "showRibbon": false,
-  "cssTheme": "GitHub Theme"
+  "cssTheme": "Atom",
+  "theme": "moonstone"
 }

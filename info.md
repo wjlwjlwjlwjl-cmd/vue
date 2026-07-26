@@ -124,6 +124,8 @@ setup 函数是 Vue 代码的入口，所有 Vue 的逻辑代码都在这里实�
 * 语法格式为 `v-bind:标签属性="content"`，将 content 表达式结果绑定到标签的“标签属性”
 * 属性绑定指令可以简写为 `:标签属性="content"`
 
+> 后面 ElementPlus 组件中使用的 `:model`、`:rules`、`:data` 都是属性绑定指令的简化写法
+
 ### 2.3 事件绑定指令
 
 * 语法格式为 `v-on:事件="expression/funcion"`，当事件发生时，调用函数或者执行表达式
@@ -791,3 +793,124 @@ export default useStockStore = defineStore('stock', () => {
 import { useStockStore } from '@/store/stock.js'
 const stockStore = useStockStore()
 ```
+
+## 十、ElementPlus组件库
+
+### 10.1 Quick Start
+
+* **安装**，`npm i element-plus -S`
+* **引入组件和组件样式，全局注册所有组件**
+
+```js
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+app.use(ElementPlus)
+```
+
+### 10.2 常用组件
+
+> 在 ElementPlus 的网站上有详细的介绍、代码，大部分情况下直接 copy 过来或稍作修改就可以直接使用了，能做到根据文档开发即可
+
+#### 10.2.1 Form 表单组件
+
+1. **布局**，`<el-form><el-form-item> <el-input>示例</el-input> </el-form-item></el-form>`
+2. **使用**，在 `<el-form>` 中绑定表单对象（`:model`）、规则校验对象（`:rules`），在 `<el-form-item>` 中通过 prop 指定字段名称（与规则校验对象的名称对应），在下面的具体控件中，进行双向绑定
+3. **校验**，在 JS 代码中指定校验规则对象，比如
+
+```js
+const formRules = ref([
+	username: [
+		{
+			required: true,  //不能为空
+			message: "username cannot be empty",
+			trigger: blur    //失去焦点时校验
+		}
+	],
+	password: [
+		{
+			min: 3,
+			max: 10, 
+			message: "password should within 3 and 10",
+			trigger: blur
+		}
+	]
+])
+```
+
+通过上述方式进行单个校验，整体校验需要先在获得表单实例，例如 `<el-form ref=formRef :model=form :rules=rules>`
+
+```js
+const formRef = ref(null)
+const onLogin = () => {
+	formRef.value.validate((valid) => {
+		if(!valid){
+			return ElMessage.error('form incorrect')
+		}
+	})
+}
+```
+
+4. **清空**，也需要首先获取表单实例，之后通过 `resetFields` 清空表单中所有数据
+
+#### 10.2.2 Card 卡片组件
+
+卡片组件通过三个插槽的方式进行自定义，包括
+
+* `#header`
+* `#default`
+* `#footer`
+
+#### 10.2.3 Table 表格组件
+
+1. **布局**，`<el-table><el-table-column> </el-table-column></el-table>`
+2. ElementPlus 的表格组件只需要制定数据源就可以自动完成渲染，不需要手动使用 `v-for`，具体步骤如下：
+
+	* 在 `<el-table>` 中通过 `:data` 绑定数据源
+	* `<el-table-column>` 中，`prop` 指定对应数据源中字段，`label` 指定列名称
+
+3. 表格组件还支持自定义列模板，例如
+
+```html
+<template>
+	<el-table :data="datas">
+		<el-table-column prop="prop" label="label">
+			<template #default>
+				<el-icon :size=18> <Edit/> </el-icon>
+			</template>
+		</el-table-column>
+	</el-table>
+</template>
+```
+
+#### 10.2.4 Tree 树形组件
+
+1. **布局**，`<el-tree \>`
+2. el-tree 通过 `<el-tree :data />` 指定数据源，其中有两个重要字段：`label` 和 `children`，前者指定项名称，后者通过数组的方式指定子结构
+3. 树形组件支持通过作用域表单自定义数据，例如
+
+```html
+<template>
+	<el-tree :data="datas">
+		<template #default="{ data }">
+		</template>
+	</el-tree>
+</template>
+```
+
+其中 `data` 为这一行要渲染的数据
+
+#### 10.2.5 对话框组件
+
+1. **组成**，通过三个插槽进行自定义，包括 
+
+	* `#header`
+	* `#default`
+	* `#footer`
+
+2. **显示**，双向绑定到一个 boolean，true 则展示，否则不展示
+3. **标题**，默认为空，通过 `title` 指定
+4. **关闭回调**，通过 `:before-close` 绑定
+
+#### 10.2.6  Menu
+
+**布局**，`<el-menu> <el-menu-item><el-menu-item> </el-menu>` 或者 `<el-menu> <el-sub-menu></el-sub-menu> </el-menu>`
